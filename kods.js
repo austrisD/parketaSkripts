@@ -25,7 +25,7 @@ let laminatdeeli = [
 ];
 
 function veidotPlaanu() {
-  let cycleCountLimit = 500;
+  let cycleCountLimit = 2000;
   let cycleCount = 0;
 
   while (0 < cycleCountLimit) {
@@ -33,35 +33,43 @@ function veidotPlaanu() {
     let ROW = Math.floor(Math.random() * FloorPlan.length);
     let SPOT = Math.floor(Math.random() * 12);
     let DisabledLocation = ROW < 9 && SPOT < 4;
-    let DisabledLocationNext = FloorPlan[ROW][SPOT + 1] == "_disabled_";
     let FilledLocation = FloorPlan[ROW][SPOT] == "_disabled_";
-    let isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1;
+    let isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1 ||  ROW % 2 == 1 && SPOT % 2 == 0 ;
+    let sameType =
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT+4>12?SPOT+4:0 ] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT+4>12?SPOT+4:0] 
     let inventoryEmpty = false;
-    let attemptsCount = 200;
+    let attemptsCount = 500;
+    
 
     function newNumbers() {
       ROW = Math.floor(Math.random() * FloorPlan.length);
       SPOT = Math.floor(Math.random() * 12);
       DisabledLocation = ROW < 9 && SPOT < 4;
-      DisabledLocationNext = FloorPlan[ROW][SPOT + 1] == "_disabled_";
       FilledLocation = FloorPlan[ROW][SPOT] == "_disabled_";
-      isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1;
+      isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1 ||  ROW % 2 == 1 && SPOT % 2 == 0 ;
+      sameType = FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT+4>12?SPOT+4:0 ] &&
+      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT+4>12?SPOT+4:0] ;
     }
 
-    //lokācijas pārbaude, ja vieta aizpildīta paņem citu  aa
+    //if spot already filled take another one
     while (
       attemptsCount > 0 &&
       DisabledLocation &&
       FilledLocation
     ) {
-      if (DisabledLocation) console.log("changing numbers=disabled location");
-      if (FilledLocation) console.log("changing numbers=spot already taken");
+      // if (DisabledLocation) console.log("changing numbers=disabled location");
+      // if (FilledLocation) console.log("changing numbers=spot already taken");
       newNumbers();
       attemptsCount--;
     }
 
-    //ja nav vairs dēli paņemt citu
-    while (attemptsCount > 0 && laminatdeeli[selectRandomPlank].count < 1) {
+    //if there is no more planks in selected inventory take another.
+    while (attemptsCount > 0 && laminatdeeli[selectRandomPlank].count < 1 && sameType ) {
       selectRandomPlank = Math.floor(Math.random() * laminatdeeli.length);
       if (laminatdeeli[selectRandomPlank].count == 0) console.log("there is no more:" + laminatdeeli[selectRandomPlank].key);
        attemptsCount--;
@@ -70,14 +78,24 @@ function veidotPlaanu() {
     //viss labi, var ievietot dēli
     if (
       attemptsCount > 0 &&
-      !inventoryEmpty &&
-      !DisabledLocation &&
+      !inventoryEmpty &&      
       FilledLocation &&
-      isPairNumberLocation
+      isPairNumberLocation &&
+      !sameType &&
+      laminatdeeli[selectRandomPlank].count > 0
     ) {
       FloorPlan[ROW][SPOT] = laminatdeeli[selectRandomPlank].key;
       laminatdeeli[selectRandomPlank].count =
         laminatdeeli[selectRandomPlank].count - 1; //noņet dēli no inventorija
+
+      //place a board in next spot
+      console.log();
+      let nextSpot = SPOT + 1;
+      if (nextSpot < 12) {
+        FloorPlan[ROW][SPOT + 1] = laminatdeeli[selectRandomPlank].key;
+      } else if (ROW + 1 < FloorPlan.length && ROW + 1 > 9) {
+        FloorPlan[ROW + 1][0] = laminatdeeli[selectRandomPlank].key;
+      }
     }
 
 
@@ -94,14 +112,6 @@ function veidotPlaanu() {
       inventoryEmpty = true;
       console.log("inventorijs ir tukš cycleCount:" + cycleCount);
     }
-
-    // laminatdeeli.map((item) => {
-    //   if (item.count < 1) {
-    //     cycleCountLimit = 0;
-    //     inventoryEmpty = true;
-    //     console.log(item.key, "inventorijs ir tukš");
-    //   }
-    // });
 
     cycleCountLimit--;
     cycleCount++;
@@ -137,7 +147,7 @@ function veidotPlaanu() {
 
       setTimeout(() => {
           div.innerHTML = element;        
-      }, 1000);
+      }, 2000);
 
 
   }
