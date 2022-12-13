@@ -9,39 +9,11 @@
   </head>
   <body>
     <table>
-      <tbody id="plan" style="background-color: rgb(red, green, blue)"></tbody>
+      <tbody id="plan"></tbody>
     </table>
     <script type="text/javascript" src="kods.js"></script>
     <script>
-      const div = document.getElementById("plan");
-
-      let element = "";
-
-      const darkSimple = "rgb(83, 55, 26)";
-      const lite = "rgb(205, 172, 139)";
-      const dark = "rgb(133, 88, 41)";
-      const darkLite = "rgb(197, 142, 86)";
-      const main = "rgb(134, 98, 61)";
-
-      FloorPlan.forEach(function (value, key) {
-        let row = "";
-        value.forEach(function (spot, key) {
-          let color = "rgb(134, 98, 61)";
-            switch (spot) {
-            case "darkSimple": color = darkSimple; break;
-            case "___lite___": color = lite; break;
-            case "___dark___": color = dark; break;
-            case "_darkLite_": color = darkLite; break;
-            case "___main___": color = main; break;          
-            default:break;
-          }
-
-          row += `<td style="background-color: ${color}" >${spot}</td>`;
-        });
-        element += `<tr>${row}</tr>`;
-      });
-
-      div.innerHTML = element;
+     
     </script>
   </body>
 </html>
