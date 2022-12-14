@@ -1,5 +1,6 @@
 let FloorPlan = [];
-for (let i = 0; i < 20; i++) {
+let i = 0;
+for (; i < 20; i++) {
   FloorPlan.push([
     ["_disabled_"],
     ["_disabled_"],
@@ -25,7 +26,7 @@ let laminatdeeli = [
 ];
 
 function veidotPlaanu() {
-  let cycleCountLimit = 2000;
+  let cycleCountLimit = 500;
   let cycleCount = 0;
 
   while (0 < cycleCountLimit) {
@@ -35,26 +36,23 @@ function veidotPlaanu() {
     let DisabledLocation = ROW < 9 && SPOT < 4;
     let FilledLocation = FloorPlan[ROW][SPOT] == "_disabled_";
     let isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1 ||  ROW % 2 == 1 && SPOT % 2 == 0 ;
-    let sameType =
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT+4>12?SPOT+4:0 ] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT+4>12?SPOT+4:0] 
     let inventoryEmpty = false;
-    let attemptsCount = 500;
-    
-
+    let attemptsCount = 200;
+    let isCorrectPlank = 
+          ROW - 1 > 0?  laminatdeeli[selectRandomPlank].key == FloorPlan[ROW - 1][SPOT]:false   &&
+          ROW - 1 > 0?  laminatdeeli[selectRandomPlank].key == FloorPlan[ROW - 1][SPOT+ 2]:false &&
+          ROW + 1 < 20? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW + 1][SPOT]:false   &&
+          ROW + 1 < 20? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW + 1][SPOT+ 2]:false &&
+          SPOT - 2 > 0? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW][SPOT - 2]:false   &&
+          SPOT + 2 < 12?laminatdeeli[selectRandomPlank].key == FloorPlan[ROW][SPOT + 2]:false
+  
     function newNumbers() {
       ROW = Math.floor(Math.random() * FloorPlan.length);
       SPOT = Math.floor(Math.random() * 12);
       DisabledLocation = ROW < 9 && SPOT < 4;
       FilledLocation = FloorPlan[ROW][SPOT] == "_disabled_";
       isPairNumberLocation = ROW % 2 == 0 && SPOT % 2 == 1 ||  ROW % 2 == 1 && SPOT % 2 == 0 ;
-      sameType = FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW - 1 < 0 ? 0 : ROW - 1][SPOT+4>12?SPOT+4:0 ] &&
-      FloorPlan[ROW][SPOT] == FloorPlan[ROW + 1 > 19 ? 0 : ROW + 1][SPOT+4>12?SPOT+4:0] ;
-    }
+    } 
 
     //if spot already filled take another one
     while (
@@ -68,25 +66,30 @@ function veidotPlaanu() {
       attemptsCount--;
     }
 
-    //if there is no more planks in selected inventory take another.
-    while (attemptsCount > 0 && laminatdeeli[selectRandomPlank].count < 1 && sameType ) {
+    //if there is no more planks in selected inventory take another
+    while (attemptsCount > 0 && laminatdeeli[selectRandomPlank].count < 1 && isCorrectPlank ) {
       selectRandomPlank = Math.floor(Math.random() * laminatdeeli.length);
       if (laminatdeeli[selectRandomPlank].count == 0) console.log("there is no more:" + laminatdeeli[selectRandomPlank].key);
        attemptsCount--;
     }
-
-    //viss labi, var ievietot dēli
+    //board placing in table 
+    isCorrectPlank = 
+          ROW - 1 > 0?  laminatdeeli[selectRandomPlank].key == FloorPlan[ROW - 1][SPOT]:false   &&   
+          ROW - 1 > 0?  laminatdeeli[selectRandomPlank].key == FloorPlan[ROW - 1][SPOT+ 2]:false &&  
+          ROW + 1 < 20? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW + 1][SPOT]:false   && 
+          ROW + 1 < 20? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW + 1][SPOT+ 2]:false &&  
+          SPOT - 2 > 0? laminatdeeli[selectRandomPlank].key == FloorPlan[ROW][SPOT - 2]:false   &&
+          SPOT + 2 < 12?laminatdeeli[selectRandomPlank].key == FloorPlan[ROW][SPOT + 2]:false
     if (
       attemptsCount > 0 &&
-      !inventoryEmpty &&      
+      !inventoryEmpty &&
       FilledLocation &&
       isPairNumberLocation &&
-      !sameType &&
-      laminatdeeli[selectRandomPlank].count > 0
+      laminatdeeli[selectRandomPlank].count > 0 &&
+      !isCorrectPlank
     ) {
       FloorPlan[ROW][SPOT] = laminatdeeli[selectRandomPlank].key;
-      laminatdeeli[selectRandomPlank].count =
-        laminatdeeli[selectRandomPlank].count - 1; //noņet dēli no inventorija
+      laminatdeeli[selectRandomPlank].count = laminatdeeli[selectRandomPlank].count - 1; //noņet dēli no inventorija
 
       //place a board in next spot
       console.log();
@@ -97,9 +100,6 @@ function veidotPlaanu() {
         FloorPlan[ROW + 1][0] = laminatdeeli[selectRandomPlank].key;
       }
     }
-
-
-
 
     if (
       laminatdeeli[0].count < 1 &&
@@ -136,7 +136,7 @@ function veidotPlaanu() {
             case "___lite___": color = lite; break;
             case "___dark___": color = dark; break;
             case "_darkLite_": color = darkLite; break;
-            case "___main___": color = main; break;          
+            case "___main___": color = main; break;
             default:break;
           }
 
@@ -146,11 +146,11 @@ function veidotPlaanu() {
       });
 
       setTimeout(() => {
-          div.innerHTML = element;        
-      }, 2000);
-
+          div.innerHTML = element;
+      }, 5000);
 
   }
+
 }
 
 veidotPlaanu();
